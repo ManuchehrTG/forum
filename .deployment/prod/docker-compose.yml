@@ -13,12 +13,12 @@ services:
       - "traefik.http.services.backend_forum.loadbalancer.server.port=${BACKEND_PORT}"
     env_file:
       - ./.deployment/prod/.env
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://backend:${BACKEND_PORT}/health/"]
-      interval: 15s
-      timeout: 15s
-      retries: 3
-      start_period: 30s
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://backend:${BACKEND_PORT}/health/"]
+    #   interval: 15s
+    #   timeout: 15s
+    #   retries: 3
+    #   start_period: 30s
     volumes:
       # - ./backend:/app
       # - ./celery_app:/app/celery_app
@@ -59,11 +59,11 @@ services:
     restart: unless-stopped
     volumes:
       - redis_data:/data
-    # healthcheck:
-    #   test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-    #   interval: 5s
-    #   timeout: 5s
-    #   retries: 5
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - app-network
     labels:
