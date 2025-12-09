@@ -1,0 +1,39 @@
+- code: "discussion"
+  allow_hide: true
+  tech_version: "minimum"
+
+- code: "experience_exchange"
+  allow_hide: true
+  tech_version: "minimum"
+
+- code: "description"
+  allow_hide: false
+
+- code: "perfect_result"
+  allow_hide: true
+  tech_version: "minimum"
+
+- code: "project_modules"
+  allow_hide: true
+  tech_version: "minimum"
+
+- code: "chat_ideas"
+  openai_prompt: "Улучшите текст идеи, сделав его максимально лаконичным. Ответьте только улучшенным текстом, без дополнительных комментариев."
+  allow_hide: true
+  tech_version: "full"
+
+- code: "chat_qa"
+  allow_hide: true
+  tech_version: "full"
+
+- code: "chat_publications"
+  allow_hide: true
+  tech_version: "full"
+
+- code: "chat_tasks"
+  allow_hide: true
+  tech_version: "full"
+
+- code: "chat_experiments"
+  allow_hide: true
+  tech_version: "full"

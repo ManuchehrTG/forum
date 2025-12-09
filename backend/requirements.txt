@@ -1,0 +1,16 @@
+aiogram
+asyncpg
+fastapi
+uvicorn
+Pillow
+pydantic-settings
+pydantic[email]
+python-multipart
+pyyaml
+PyJWT
+dotenv
+redis
+httpx
+openai
+exifread
+ffmpeg
