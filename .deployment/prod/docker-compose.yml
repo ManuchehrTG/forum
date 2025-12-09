@@ -1,26 +1,4 @@
 services:
-  # celery:
-  #   restart: unless-stopped
-  #   build:
-  #     context: ./celery_app
-  #     dockerfile: Dockerfile
-  #   env_file:
-  #     - ./.deployment/prod/.env
-  #   environment:
-  #     - PYTHONPATH=/app
-  #   volumes:
-  #     # - ./celery_app:/app/celery_app
-  #     - ./infrastructure:/app/infrastructure
-  #     - ./logs:/app/logs
-  #     # - ./storage:/app/storage
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
-  #   networks:
-  #     - app-network
-
   backend:
     restart: unless-stopped
     build:
@@ -55,38 +33,6 @@ services:
       - app-network
       - web
 
-  # telegram_bot:
-  #   restart: unless-stopped
-  #   build:
-  #     context: ./telegram_bot
-  #     dockerfile: Dockerfile
-  #   labels:
-  #     - "traefik.enable=${TRAEFIK_ENABLE:-false}"
-  #     - "traefik.http.routers.sxr_ai_conference_telegram_bot.rule=Host(`${TELEGRAM_BOT_DOMAIN}`)"
-  #     - "traefik.http.routers.sxr_ai_conference_telegram_bot.entrypoints=websecure"
-  #     - "traefik.http.routers.sxr_ai_conference_telegram_bot.tls=true"
-  #     - "traefik.http.routers.sxr_ai_conference_telegram_bot.tls.certresolver=myresolver"
-  #     - "traefik.http.services.sxr_ai_conference_telegram_bot.loadbalancer.server.port=${TELEGRAM_BOT_PORT}"
-  #     - "traefik.http.services.sxr_ai_conference_telegram_bot.loadbalancer.server.scheme=http"
-  #   env_file:
-  #     - ./.deployment/prod/.env
-  #   environment:
-  #     - PYTHONUNBUFFERED=1
-  #   volumes:
-  #     - ./telegram_bot:/app/telegram_bot
-  #     - ./celery_app:/app/celery_app
-  #     - ./config:/app/config
-  #     - ./infrastructure:/app/infrastructure
-  #     - ./logs:/app/logs
-  #     - ./storage:/app/storage
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
-  #   networks:
-  #     - app-network
-
   postgres:
     image: postgres:16.2
     restart: unless-stopped
@@ -113,11 +59,11 @@ services:
     restart: unless-stopped
     volumes:
       - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+    # healthcheck:
+    #   test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+    #   interval: 5s
+    #   timeout: 5s
+    #   retries: 5
     networks:
       - app-network
     labels:
