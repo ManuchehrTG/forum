@@ -1,20 +1,28 @@
-# Byte-compiled  optimized  DLL files
-__pycache__
-.py[cod]
-$py.class
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
 .Python
 
 # Environment
 .env
 .env.*
+!.env.example
 
 # Docker
-.pid
+docker-compose.override.yml
+*.pid
 
-.log
+*.log
 
 # Sublime
 *.sublime-project
+*.sublime-workspace
 
 # Other
-.venv
+.venv/
+
+logs/
+storage/
+
+!backend/src/**/storage/
