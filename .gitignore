@@ -6,9 +6,15 @@ $py.class
 
 # Environment
 .env
-.env.
+.env.*
 
 # Docker
 .pid
 
 .log
+
+# Sublime
+*.sublime-project
+
+# Other
+.venv

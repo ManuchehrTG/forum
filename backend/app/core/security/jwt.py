@@ -33,10 +33,10 @@ def verify_jwt(token: str) -> Dict[str, Any] | None:
 
 		return payload
 
-	except (jwt.PyJWTError, jwt.DecodeError, jwt.InvalidSignatureError, jwt.InvalidTokenError) as e:
-		raise InvalidTokenError()
 	except jwt.ExpiredSignatureError:
 		raise TokenExpiredError()
+	except (jwt.PyJWTError, jwt.DecodeError, jwt.InvalidSignatureError, jwt.InvalidTokenError) as e:
+		raise InvalidTokenError()
 
 def _should_refresh_token(payload: Dict[str, Any]) -> bool:
 	"""Определяет, нужно ли обновлять токен.

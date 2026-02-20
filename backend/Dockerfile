@@ -1,4 +1,3 @@
-# Dockerfile
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -14,4 +13,4 @@ COPY . /app
 ENV PYTHONUNBUFFERED=1
 
 # Команда запуска
-CMD ["python3", "-u", "main.py"]
+CMD ["python3", "-u", "-m", "src.main"]
