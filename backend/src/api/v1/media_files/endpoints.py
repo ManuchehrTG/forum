@@ -10,7 +10,7 @@ from src.application.users.dtos import UserDTO
 
 router = APIRouter(prefix="/media_files", tags=["MediaFiles"])
 
-@router.post("/uploads", response_model=List[UUID])
+@router.post("/uploads", response_model=List[UUID], summary="Upload media files", description="<b>Загрузка медифайлов в временное хранилище.</b>")
 async def uploads_endpoint(
 	files: List[UploadFile],
 	user: UserDTO = Depends(get_current_user),

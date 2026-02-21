@@ -14,7 +14,7 @@ from src.application.themes.use_cases.get_theme_sections import GetThemeSections
 
 router = APIRouter(prefix="/themes", tags=["Themes"])
 
-@router.post("", response_model=IdResponse, status_code=201)
+@router.post("", response_model=IdResponse, status_code=201, summary="Create theme", description="<b>Создать новую тему.</b>")
 async def create_theme_endpoint(
 	request: schemas.ThemeCreateRequest,
 	user: UserDTO = Depends(get_current_user),
@@ -27,21 +27,21 @@ async def create_theme_endpoint(
 	theme_id = await create_theme.execute(command)
 	return IdResponse(id=theme_id)
 
-@router.get("/root", response_model=schemas.ThemeResponse)
+@router.get("/root", response_model=schemas.ThemeResponse, summary="Get root theme", description="<b>Получить корневую-главную тему.</b>")
 async def get_root_theme_endpoint(
 	user: UserDTO = Depends(get_current_user),
 	theme: ThemeDTO = Depends(get_root_theme)
 ):
 	return schemas.ThemeResponse.from_orm(theme)
 
-@router.get("/{theme_id}", response_model=schemas.ThemeResponse)
+@router.get("/{theme_id}", response_model=schemas.ThemeResponse, summary="Get theme", description="<b>Получить конкретную тему.</b>")
 async def get_theme_endpoint(
 	user: UserDTO = Depends(get_current_user),
 	theme: ThemeDTO = Depends(get_theme)
 ):
 	return schemas.ThemeResponse.from_orm(theme)
 
-@router.get("/{theme_id}/sections", response_model=List[schemas.ThemeSectionResponse])
+@router.get("/{theme_id}/sections", response_model=List[schemas.ThemeSectionResponse], summary="Get theme sections", description="<b>Получить доступные секции темы.</b>")
 async def get_theme_sections_endpoint(
 	user: UserDTO = Depends(get_current_user),
 	theme: ThemeDTO = Depends(get_theme),

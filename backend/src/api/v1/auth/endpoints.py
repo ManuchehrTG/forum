@@ -7,8 +7,8 @@ from src.application.auth.use_cases.by_telegram import AuthByTelegram
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
-@router.post("/telegram/login", response_model=schemas.AuthResponse)
-async def telegram_login_endpoint(
+@router.post("/telegram", response_model=schemas.AuthResponse)
+async def auth_telegram_endpoint(
 	payload: schemas.TelegramAuthRequest,
 	auth_by_telegram: AuthByTelegram = Depends(get_auth_by_telegram)
 ):

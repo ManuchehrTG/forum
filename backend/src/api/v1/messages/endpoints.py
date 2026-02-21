@@ -3,8 +3,9 @@ from typing import List
 
 from . import schemas
 from .dependencies import (
-	get_comment, get_create_comment, get_create_post, get_create_task_assignment, get_message, get_post, get_retrieve_comments, get_retrieve_posts,
-	get_create_task, get_retrieve_task_assignments, get_task, get_retrieve_tasks, get_task_assignment,
+	get_create_post, get_create_task, get_create_task_assignment, get_create_comment,
+	get_message, get_post, get_task, get_task_assignment, get_comment,
+	get_retrieve_posts, get_retrieve_tasks, get_retrieve_task_assignments, get_retrieve_comments,
 	get_upsert_message_reaction, get_retrieve_message_reaction, get_retrieve_message_reaction_stats
 )
 from src.api.v1 import schemas as v1_schemas
@@ -170,21 +171,20 @@ async def get_comment_endpoint(
 
 
 @router.patch(
-	"/{message_id}/reaction",
+	"/{id}/reaction",
 	response_model=schemas.MessageReactionResponse,
 	responses={
 		201: {"model": schemas.MessageReactionResponse},
 		204: {"description": "Deleted successfully"}
 	},
 	summary="Upsert reaction",
-	description="""
-	Установить, изменить или удалить реакцию на сообщение.
+	description=(
+		"<b>Установить, изменить или удалить реакцию на сообщение.</b>\n\n"
+		"- Отправьте reaction: like, dislike (см. <code>MessageReactionTypeAPI</code>) чтобы поставить или изменить реакцию\n"
+		"- Отправьте reaction=null чтобы удалить реакцию\n\n"
+		"Один пользователь может иметь только одну реакцию на сообщение."
+	)
 
-	- Отправьте reaction=<MessageReactionTypeAPI> чтобы поставить или изменить реакцию
-	- Отправьте reaction=null чтобы удалить реакцию
-
-	Один пользователь может иметь только одну реакцию на сообщение.
-	"""
 )
 async def upsert_message_reaction_endpoint(
 	request: schemas.UpsertMessageReactionRequest,
@@ -200,7 +200,15 @@ async def upsert_message_reaction_endpoint(
 
 	return schemas.MessageReactionResponse.model_validate(message_reaction.model_dump())
 
-@router.get("/{message_id}/reaction", response_model=schemas.MessageReactionResponse)
+@router.get(
+	"/{id}/reaction",
+	response_model=schemas.MessageReactionResponse,
+	summary="Get message reaction",
+	description=(
+		"<b>Получить реакцию пользователя.</b>\n\n"
+		"- Можно использовать для UI/UX текущего пользователя"
+	)
+)
 async def get_message_reaction_endpoint(
 	user: UserDTO = Depends(get_current_user),
 	message: MessageDTO = Depends(get_message),
@@ -211,7 +219,12 @@ async def get_message_reaction_endpoint(
 
 	return schemas.MessageReactionResponse.model_validate(message_reaction.model_dump())
 
-@router.get("/{message_id}/reactions", response_model=schemas.MessageReactionStatsResponse)
+@router.get(
+	"/{id}/reactions",
+	response_model=schemas.MessageReactionStatsResponse,
+	summary="Get message reaction stats",
+	description="<b>Получить количество всех реакций в формате JSON.</b>"
+)
 async def get_message_reaction_stats_endpoint(
 	user: UserDTO = Depends(get_current_user),
 	message: MessageDTO = Depends(get_message),
