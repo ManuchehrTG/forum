@@ -15,6 +15,7 @@ class TaskAssignmentStatus(Enum):
 	CANCELLED = "cancelled"
 	FAILED = "failed"
 
+
 @dataclass(frozen=True)
 class PostMessageData:
 	"""Данные поста"""

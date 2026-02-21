@@ -1,20 +1,29 @@
 from datetime import datetime
 from enum import Enum
 from pydantic import BaseModel, Field, field_validator
-from typing import List
+from typing import Dict, List
 from uuid import UUID
 
 class MessageTypeAPI(str, Enum):
-    POST = "post"
-    TASK = "task"
-    TASK_ASSIGNMENT = "task_assignment"
-    COMMENT = "comment"
+	POST = "post"
+	TASK = "task"
+	TASK_ASSIGNMENT = "task_assignment"
+	COMMENT = "comment"
 
 class TaskMessageStatusAPI(str, Enum):
 	IN_PROGRESS = "in_progress"
 	COMPLETED = "completed"
 	CANCELLED = "cancelled"
 	FAILED = "failed"
+
+class MessageReactionTypeAPI(str, Enum):
+	LIKE = "like"
+	DISLIKE = "dislike"
+
+
+class MessageMediaFileData(BaseModel):
+	media_file_id: UUID = Field(..., description="ID медиафайла")
+	sort_order: int = Field(..., description="Сортировка по возростанию")
 
 # ============ REQUEST SCHEMAS ============
 
@@ -56,23 +65,19 @@ CreateMessageRequest = CreatePostRequest | CreateTaskRequest | CreateTaskAssignm
 
 # ============ RESPONSE SCHEMAS ============
 
-class MessageMediaFileRepsonse(BaseModel):
-	media_file_id: UUID
-	sort_order: int
-
 class MessageBaseResponse(BaseModel):
 	"""Базовая схема ответа"""
-	id: UUID
-	type: MessageTypeAPI
-	text: str
-	author_id: UUID | None
-	theme_id: UUID
-	section_id: UUID
-	is_openai_generated: bool
-	created_at: datetime
-	updated_at: datetime
+	id: UUID = Field(..., description="ID сообщения")
+	type: MessageTypeAPI = Field(..., description="Тип сообщения")
+	text: str | None = Field(None, description="Текст сообщения. Может быть пустым.")
+	author_id: UUID = Field(..., description="ID автора")
+	theme_id: UUID = Field(..., description="ID темы")
+	section_id: UUID = Field(..., description="ID секции")
+	is_openai_generated: bool = Field(False, description="Сгенерировано ли с помощью AI")
+	created_at: datetime = Field(..., description="Дата создания")
+	updated_at: datetime = Field(..., description="Дата обновления")
 
-	media_files: List[MessageMediaFileRepsonse]
+	media_files: List[MessageMediaFileData] = Field(..., description="Медиафайлы")
 
 class PostMessageResponse(MessageBaseResponse):
 	"""Ответ с данными поста"""
@@ -80,27 +85,34 @@ class PostMessageResponse(MessageBaseResponse):
 
 class TaskMessageResponse(MessageBaseResponse):
 	"""Ответ с данными задачи"""
-	ratio: int
+	ratio: int = Field(..., description="Коэффициент задачи")
 
 class TaskAssignmentResponse(MessageBaseResponse):
 	"""Ответ с данными назначения задачи"""
 	content_id: UUID = Field(..., description="ID сообщения, к которому комментарий")
-	is_partially: bool
-	status: str
-	expires_at: datetime
+	is_partially: bool = Field(False, description="Частично")
+	status: str = Field(..., description="Статус")
+	expires_at: datetime = Field(..., description="Дата дедлайна")
 
 class CommentMessageResponse(MessageBaseResponse):
 	"""Ответ с данными комментария"""
 	content_id: UUID = Field(..., description="ID сообщения, к которому комментарий")
-	reply_to_message_id: UUID | None
+	reply_to_message_id: UUID | None = Field(None, description="ID комментария, на который отвечаем")
 
 # Union для общего ответа
 MessageResponse = MessageBaseResponse | TaskMessageResponse | CommentMessageResponse | TaskAssignmentResponse
 
 
-# ============ SPECIAL RESPONSES ============
 
-class MessageCreatedResponse(BaseModel):
-	"""Минимальный ответ после создания"""
-	id: UUID
-	created_at: datetime
+class UpsertMessageReactionRequest(BaseModel):
+	reaction: MessageReactionTypeAPI | None = Field(..., description="Реакция для сообщения. None чтобы удалить")
+
+class MessageReactionResponse(BaseModel):
+	user_id: UUID = Field(..., description="ID пользователя")
+	message_id: UUID = Field(..., description="ID сообщения")
+	reaction: MessageReactionTypeAPI = Field(..., description="Реакция текущего пользователя")
+	updated_at: datetime = Field(..., description="Дата обновления")
+
+class MessageReactionStatsResponse(BaseModel):
+	reactions: Dict[MessageReactionTypeAPI, int] = Field(default_factory=dict, description="Все реакции сообщения. <reaction>: <count>")
+	total: int = Field(..., description="Количество реакций")

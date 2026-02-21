@@ -27,7 +27,7 @@ class Section:
 		self.allow_hide = allow_hide
 
 		self.created_at = created_at or datetime.utcnow()
-		self.updated_at = updated_at or datetime.utcnow()
+		self.updated_at = updated_at or self.created_at
 
 		self._allowed_message_types = allowed_message_types or []
 

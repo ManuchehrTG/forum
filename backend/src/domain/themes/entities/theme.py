@@ -21,9 +21,8 @@ class Theme:
 		self.author_id = author_id
 		self.title = title
 		self.is_group = is_group
-
 		self.created_at = created_at or datetime.utcnow()
-		self.updated_at = updated_at or datetime.utcnow()
+		self.updated_at = updated_at or self.created_at
 
 		self._sections = sections or []
 

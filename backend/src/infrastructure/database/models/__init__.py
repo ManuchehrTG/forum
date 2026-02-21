@@ -2,6 +2,7 @@ from .linked_account import LinkedAccountModel
 from .media_file import MediaFileModel
 from .message import MessageModel
 from .message_media_file import MessageMediaFileModel
+from .message_reaction import MessageReactionModel
 from .section import SectionModel
 from .section_message_type import SectionMessageTypeModel
 from .theme import ThemeModel

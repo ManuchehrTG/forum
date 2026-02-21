@@ -162,3 +162,4 @@ class RawSQLMessageRepository(MessageRepository):
 			rows = await connection.fetch(query, *params)
 
 			return [Message.from_db_record_with_data_and_media(row) for row in rows]
+

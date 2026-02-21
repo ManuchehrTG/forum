@@ -10,9 +10,9 @@ from src.infrastructure.database.base import Base, TimestampMixin
 class MessageModel(Base, TimestampMixin):
 	__tablename__ = "messages"
 
-	author_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
-	theme_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("themes.id", ondelete="CASCADE"), nullable=False)
-	section_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("sections.id", ondelete="CASCADE"), nullable=False)
+	author_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
+	theme_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("themes.id", ondelete="RESTRICT"), nullable=False)
+	section_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("sections.id", ondelete="RESTRICT"), nullable=False)
 	type: Mapped[str] = mapped_column(String(32), nullable=False)
 	text: Mapped[str | None] = mapped_column(Text, nullable=True)
 	is_openai_generated: Mapped[bool] = mapped_column(Boolean, server_default=sqlalchemy_text("true"))

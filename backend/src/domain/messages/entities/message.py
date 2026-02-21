@@ -32,9 +32,8 @@ class Message:
 		self.type = type
 		self.text = text
 		self.is_openai_generated = is_openai_generated
-
 		self.created_at = created_at or datetime.utcnow()
-		self.updated_at = updated_at or datetime.utcnow()
+		self.updated_at = updated_at or self.created_at
 
 		self.post_data = post_data
 		self.task_data = task_data

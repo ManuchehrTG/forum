@@ -12,7 +12,7 @@ class MediaFileModel(Base, TimestampMixin):
 	"""
 	__tablename__ = "media_files"
 
-	author_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+	author_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
 
 	# Основная информация о файле
 	filename: Mapped[str] = mapped_column(String(255), nullable=False)

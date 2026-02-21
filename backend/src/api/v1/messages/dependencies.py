@@ -5,6 +5,9 @@ from uuid import UUID
 from src.api.dependencies import get_db_pool
 from src.api.v1.media_files.dependencies import get_media_file_repository, get_storage_service
 from src.api.v1.sections.dependencies import get_section_repository
+from src.application.message_reactions.use_cases.get import GetMessageReaction
+from src.application.message_reactions.use_cases.get_stats import GetMessageReactionStats
+from src.application.message_reactions.use_cases.upsert import UpsertMessageReaction
 from src.application.messages.dtos import MessageDTO
 from src.application.messages.queries import GetCommentQuery, GetMessageQuery, GetPostQuery, GetTaskAssignmentQuery, GetTaskQuery
 from src.application.messages.services.media_attachment import MessageMediaAttachmentService
@@ -22,10 +25,12 @@ from src.application.messages.use_cases.get_task_assignment import GetTaskAssign
 from src.application.messages.use_cases.get_task_assignments import GetTaskAssignments
 from src.application.messages.use_cases.get_tasks import GetTasks
 from src.domain.media_files.repository import MediaFileRepository
+from src.domain.message_reactions.repository import MessageReactionRepository
 from src.domain.messages.repository import MessageRepository
 from src.domain.sections.repository import SectionRepository
 from src.domain.interfaces.storage_service import StorageService
 from src.infrastructure.database.repositories.raw_sql.messages import RawSQLMessageRepository
+from src.infrastructure.database.repositories.raw_sql.message_reactions import RawSQLMessageReactionRepository
 
 async def get_message_repository(
 	pool: Pool = Depends(get_db_pool)
@@ -153,3 +158,25 @@ async def get_comment(
 ) -> MessageDTO:
 	query = GetCommentQuery(comment_id=comment_id)
 	return await get_comment.execute(query)
+
+
+
+async def get_message_reaction_repository(
+	pool: Pool = Depends(get_db_pool)
+) -> MessageReactionRepository:
+	return RawSQLMessageReactionRepository(pool)
+
+async def get_upsert_message_reaction(
+	message_reaction_repo: MessageReactionRepository = Depends(get_message_reaction_repository)
+) -> UpsertMessageReaction:
+	return UpsertMessageReaction(message_reaction_repo)
+
+async def get_retrieve_message_reaction(
+	message_reaction_repo: MessageReactionRepository = Depends(get_message_reaction_repository)
+) -> GetMessageReaction:
+	return GetMessageReaction(message_reaction_repo)
+
+async def get_retrieve_message_reaction_stats(
+	message_reaction_repo: MessageReactionRepository = Depends(get_message_reaction_repository)
+) -> GetMessageReactionStats:
+	return GetMessageReactionStats(message_reaction_repo)

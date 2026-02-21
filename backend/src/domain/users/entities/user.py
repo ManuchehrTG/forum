@@ -35,15 +35,14 @@ class User:
 		self.birthday = birthday
 		self.language_code = language_code if language_code in settings.app.languages else settings.app.default_language
 		self.avatar_path = avatar_path
+		self.is_system = is_system
+		self.created_at = created_at or datetime.utcnow()
+		self.updated_at = updated_at or self.created_at
 
 		self.email = email
 		self.phone = phone
 
-		self.is_system = is_system
 		self.is_admin = is_admin
-
-		self.created_at = created_at or datetime.utcnow()
-		self.updated_at = updated_at or datetime.utcnow()
 
 		self.accounts = accounts or []
 

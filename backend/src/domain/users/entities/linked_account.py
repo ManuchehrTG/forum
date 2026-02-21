@@ -20,9 +20,8 @@ class LinkedAccount:
 		self.provider = provider
 		self.provider_user_id = provider_user_id
 		self.extra = extra or {}
-
 		self.created_at = created_at or datetime.utcnow()
-		self.updated_at = updated_at or datetime.utcnow()
+		self.updated_at = updated_at or self.created_at
 
 	@classmethod
 	def from_db_record(cls, record: dict):

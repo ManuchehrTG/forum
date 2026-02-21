@@ -1,15 +1,21 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from typing import List
 
 from . import schemas
 from .dependencies import (
 	get_comment, get_create_comment, get_create_post, get_create_task_assignment, get_message, get_post, get_retrieve_comments, get_retrieve_posts,
-	get_create_task, get_retrieve_task_assignments, get_task, get_retrieve_tasks, get_task_assignment
+	get_create_task, get_retrieve_task_assignments, get_task, get_retrieve_tasks, get_task_assignment,
+	get_upsert_message_reaction, get_retrieve_message_reaction, get_retrieve_message_reaction_stats
 )
 from src.api.v1 import schemas as v1_schemas
 from src.api.v1.sections.dependencies import get_section
 from src.api.v1.themes.dependencies import get_theme
 from src.api.v1.users.dependencies import get_current_user
+from src.application.message_reactions.commands import UpsertMessageReactionCommand
+from src.application.message_reactions.queries import GetMessageReactionQuery, GetMessageReactionStatsQuery
+from src.application.message_reactions.use_cases.get import GetMessageReaction
+from src.application.message_reactions.use_cases.get_stats import GetMessageReactionStats
+from src.application.message_reactions.use_cases.upsert import UpsertMessageReaction
 from src.application.messages.commands import CreateCommentCommand, CreatePostCommand, CreateTaskAssignmentCommand, CreateTaskCommand
 from src.application.messages.dtos import MessageDTO
 from src.application.messages.queries import GetCommentsQuery, GetPostsQuery, GetTaskAssignmentsQuery, GetTasksQuery
@@ -162,29 +168,59 @@ async def get_comment_endpoint(
 ):
 	return schemas.CommentMessageResponse.model_validate(comment.model_dump())
 
-# @router.patch("/{message_id}/reaction", response_model=List[MessageReactionResponse])
-# async def create_message_reaction_endpoint(
-# 	data: MessageReactionUpdateRequest,
-# 	user: User = Depends(get_current_user),
-# 	message: Message = Depends(get_message),
-# 	message_service: MessageService = Depends(get_message_service)
-# ):
-# 	message_reactions = await message_service.message_update_reaction(data=data, user=user, message=message)
-# 	return [
-# 		message_reaction_to_response(message_reaction=message_reaction)
-# 		for message_reaction in message_reactions
-# 	]
 
-# @router.get("/{message_id}/reactions", response_model=List[MessageReactionResponse])
-# async def get_reactions_endpoint(
-# 	user: User = Depends(get_current_user),
-# 	message_reactions: List[MessageReaction] = Depends(get_message_reactions),
-# 	message_service: MessageService = Depends(get_message_service)
-# ):
-# 	return [
-# 		message_reaction_to_response(message_reaction=message_reaction)
-# 		for message_reaction in message_reactions
-# 	]
+@router.patch(
+	"/{message_id}/reaction",
+	response_model=schemas.MessageReactionResponse,
+	responses={
+		201: {"model": schemas.MessageReactionResponse},
+		204: {"description": "Deleted successfully"}
+	},
+	summary="Upsert reaction",
+	description="""
+	Установить, изменить или удалить реакцию на сообщение.
+
+	- Отправьте reaction=<MessageReactionTypeAPI> чтобы поставить или изменить реакцию
+	- Отправьте reaction=null чтобы удалить реакцию
+
+	Один пользователь может иметь только одну реакцию на сообщение.
+	"""
+)
+async def upsert_message_reaction_endpoint(
+	request: schemas.UpsertMessageReactionRequest,
+	user: UserDTO = Depends(get_current_user),
+	message: MessageDTO = Depends(get_message),
+	upsert_message_reaction: UpsertMessageReaction = Depends(get_upsert_message_reaction)
+):
+	command = UpsertMessageReactionCommand(user_id=user.id, message_id=message.id, **request.model_dump())
+	message_reaction = await upsert_message_reaction.execute(command)
+
+	if not message_reaction:
+		return Response(status_code=204)
+
+	return schemas.MessageReactionResponse.model_validate(message_reaction.model_dump())
+
+@router.get("/{message_id}/reaction", response_model=schemas.MessageReactionResponse)
+async def get_message_reaction_endpoint(
+	user: UserDTO = Depends(get_current_user),
+	message: MessageDTO = Depends(get_message),
+	get_message_reaction: GetMessageReaction = Depends(get_retrieve_message_reaction),
+):
+	command = GetMessageReactionQuery(user_id=user.id, message_id=message.id)
+	message_reaction = await get_message_reaction.execute(command)
+
+	return schemas.MessageReactionResponse.model_validate(message_reaction.model_dump())
+
+@router.get("/{message_id}/reactions", response_model=schemas.MessageReactionStatsResponse)
+async def get_message_reaction_stats_endpoint(
+	user: UserDTO = Depends(get_current_user),
+	message: MessageDTO = Depends(get_message),
+	get_message_reaction_stats: GetMessageReactionStats = Depends(get_retrieve_message_reaction_stats),
+):
+	command = GetMessageReactionStatsQuery(message_id=message.id)
+	message_reaction_stats = await get_message_reaction_stats.execute(command)
+
+	return schemas.MessageReactionStatsResponse.model_validate(message_reaction_stats.model_dump())
 
 
 # @router.post("/openai", response_model=OpenAIGenerateTextResponse)

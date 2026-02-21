@@ -33,7 +33,7 @@ class MediaFile:
 		self.is_temp = is_temp
 
 		self.created_at = created_at or datetime.utcnow()
-		self.updated_at = updated_at or datetime.utcnow()
+		self.updated_at = updated_at or self.created_at
 
 	@property
 	def metadata(self):
