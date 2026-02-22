@@ -5,9 +5,11 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import AsyncGenerator, AsyncIterator
 
+from src.domain.interfaces.llm_service import LLMService
 from src.domain.users.exceptions import InvalidTokenError, TokenExpiredError
 from src.infrastructure.auth.jwt import JWTManager
 from src.infrastructure.database import db, get_session
+from src.infrastructure.services.openai.factory import create_openai_service
 
 security = HTTPBearer()
 
@@ -40,3 +42,7 @@ async def get_db_pool() -> Pool:
 	if db._pool is None:
 		await db.connect()
 	return db.pool
+
+
+async def get_llm_service() -> LLMService:
+	return create_openai_service()

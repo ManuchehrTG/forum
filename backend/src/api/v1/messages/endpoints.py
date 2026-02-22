@@ -4,7 +4,7 @@ from typing import List
 from . import schemas
 from .dependencies import (
 	get_create_post, get_create_task, get_create_task_assignment, get_create_comment,
-	get_message, get_post, get_task, get_task_assignment, get_comment,
+	get_message, get_message_improve_text, get_post, get_task, get_task_assignment, get_comment,
 	get_retrieve_posts, get_retrieve_tasks, get_retrieve_task_assignments, get_retrieve_comments,
 	get_upsert_message_reaction, get_retrieve_message_reaction, get_retrieve_message_reaction_stats
 )
@@ -17,7 +17,7 @@ from src.application.message_reactions.queries import GetMessageReactionQuery, G
 from src.application.message_reactions.use_cases.get import GetMessageReaction
 from src.application.message_reactions.use_cases.get_stats import GetMessageReactionStats
 from src.application.message_reactions.use_cases.upsert import UpsertMessageReaction
-from src.application.messages.commands import CreateCommentCommand, CreatePostCommand, CreateTaskAssignmentCommand, CreateTaskCommand
+from src.application.messages.commands import CreateCommentCommand, CreatePostCommand, CreateTaskAssignmentCommand, CreateTaskCommand, MessageImproveTextCommand
 from src.application.messages.dtos import MessageDTO
 from src.application.messages.queries import GetCommentsQuery, GetPostsQuery, GetTaskAssignmentsQuery, GetTasksQuery
 from src.application.messages.use_cases.create_comment import CreateComment
@@ -28,6 +28,7 @@ from src.application.messages.use_cases.get_comments import GetComments
 from src.application.messages.use_cases.get_posts import GetPosts
 from src.application.messages.use_cases.get_task_assignments import GetTaskAssignments
 from src.application.messages.use_cases.get_tasks import GetTasks
+from src.application.messages.use_cases.improve_text import MessageImproveText
 from src.application.sections.dtos import SectionDTO
 from src.application.themes.dtos import ThemeDTO
 from src.application.users.dtos import UserDTO
@@ -236,14 +237,20 @@ async def get_message_reaction_stats_endpoint(
 	return schemas.MessageReactionStatsResponse.model_validate(message_reaction_stats.model_dump())
 
 
-# @router.post("/openai", response_model=OpenAIGenerateTextResponse)
-# async def message_openai_generate_text_endpoint(
-# 	data: OpenAIGenerateTextRequest,
-# 	user: User = Depends(get_current_user),
-# 	theme: Theme = Depends(get_theme),
-# 	section: Section = Depends(get_theme_section),
-# 	message_service: MessageService = Depends(get_message_service)
-# ):
-# 	openai_generate_text = await message_service.generate_text(data=data, user=user, theme=theme, section=section)
-# 	return openai_generate_text_to_response(openai_generate_text=openai_generate_text)
+@router.post(
+	"/ai/improve_text",
+	response_model=schemas.MessageAIImproveTextResponse,
+	summary="Message AI improve text",
+	description="<b>Улучшить текст с помощью AI.</b>"
+)
+async def message_ai_improve_text_endpoint(
+	request: schemas.MessageAIImproveTextRequest,
+	user: UserDTO = Depends(get_current_user),
+	theme: ThemeDTO = Depends(get_theme),
+	section: SectionDTO = Depends(get_section),
+	message_improve_text: MessageImproveText = Depends(get_message_improve_text)
+):
+	command = MessageImproveTextCommand(section_id=section.id, **request.model_dump())
+	improve_text = await message_improve_text.execute(command)
 
+	return schemas.MessageAIImproveTextResponse.model_validate(improve_text.model_dump())

@@ -19,7 +19,7 @@ class ExternalServiceError(InfrastructureError):
 	"""Ошибки внешних сервисов"""
 	error_code = "external_service_error"
 
-	def __init__(self, service: str, **kwargs):
+	def __init__(self, service: str, original_error: Exception | None = None, **kwargs):
 		message = f"Service '{service}' is unavailable"
 		details = {"service": service}
-		super().__init__(message, details=details, **kwargs)
+		super().__init__(message, details=details, original_error=original_error, **kwargs)

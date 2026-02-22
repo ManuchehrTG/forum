@@ -2,7 +2,7 @@ from asyncpg import Pool
 from fastapi import Depends
 from uuid import UUID
 
-from src.api.dependencies import get_db_pool
+from src.api.dependencies import get_db_pool, get_llm_service
 from src.api.v1.media_files.dependencies import get_media_file_repository, get_storage_service
 from src.api.v1.sections.dependencies import get_section_repository
 from src.application.message_reactions.use_cases.get import GetMessageReaction
@@ -24,10 +24,12 @@ from src.application.messages.use_cases.get_task import GetTask
 from src.application.messages.use_cases.get_task_assignment import GetTaskAssignment
 from src.application.messages.use_cases.get_task_assignments import GetTaskAssignments
 from src.application.messages.use_cases.get_tasks import GetTasks
+from src.application.messages.use_cases.improve_text import MessageImproveText
 from src.domain.media_files.repository import MediaFileRepository
 from src.domain.message_reactions.repository import MessageReactionRepository
 from src.domain.messages.repository import MessageRepository
 from src.domain.sections.repository import SectionRepository
+from src.domain.interfaces.llm_service import LLMService
 from src.domain.interfaces.storage_service import StorageService
 from src.infrastructure.database.repositories.raw_sql.messages import RawSQLMessageRepository
 from src.infrastructure.database.repositories.raw_sql.message_reactions import RawSQLMessageReactionRepository
@@ -180,3 +182,10 @@ async def get_retrieve_message_reaction_stats(
 	message_reaction_repo: MessageReactionRepository = Depends(get_message_reaction_repository)
 ) -> GetMessageReactionStats:
 	return GetMessageReactionStats(message_reaction_repo)
+
+
+async def get_message_improve_text(
+	section_repo: SectionRepository = Depends(get_section_repository),
+	llm_service: LLMService = Depends(get_llm_service)
+) -> MessageImproveText:
+	return MessageImproveText(section_repo, llm_service)

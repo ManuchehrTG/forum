@@ -3,7 +3,7 @@ from typing import List, Tuple
 from uuid import UUID, uuid4
 
 from src.domain.messages.value_objects import MessageType
-from src.domain.sections.exceptions import CannotCommentOnCommentError, SectionMessageTypeConflictError, SectionValidationError
+from src.domain.sections.exceptions import CannotCommentOnCommentError, SectionMessageTypeConflictError, SectionValidationError, SectionAIDisabled
 from src.domain.sections.value_objects import TechVersionType, SectionMessageType
 
 class Section:
@@ -63,6 +63,13 @@ class Section:
 
 		if not self.has_allowed_comment_for_message_type(message_type):
 			raise SectionValidationError.comments_not_allowed(message_type, self.code, self.allowed_message_types)
+
+	def can_use_ai(self) -> bool:
+		return bool(self.enable_openai and self.openai_prompt)
+
+	def ensure_ai_available(self):
+		if not self.can_use_ai:
+			raise SectionAIDisabled(self.id, self.code)
 
 	@classmethod
 	def from_db_record(cls, record: dict):

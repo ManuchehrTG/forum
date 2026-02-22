@@ -21,7 +21,7 @@ class BaseAppError(Exception):
 		self.details = details or {}
 		self.details.update(kwargs)
 		self.original_error = original_error
-		self.layer = getattr(self, 'layer', 'unknown')
+		self.layer = getattr(self, "layer", "unknown")
 
 		super().__init__(self.message)
 

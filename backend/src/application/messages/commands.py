@@ -93,3 +93,9 @@ class CompleteTaskCommand:
 	task_assignment_id: UUID
 	completed_by: UUID
 	notes: str | None = None
+
+# ============ OPENAI КОМАНДЫ ============
+
+class MessageImproveTextCommand(BaseModel):
+	section_id: UUID
+	text: str

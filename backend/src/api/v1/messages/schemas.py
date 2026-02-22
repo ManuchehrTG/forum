@@ -102,7 +102,7 @@ class CommentMessageResponse(MessageBaseResponse):
 # Union для общего ответа
 MessageResponse = MessageBaseResponse | TaskMessageResponse | CommentMessageResponse | TaskAssignmentResponse
 
-
+# ============ MESSAGE REACTION SCHEMAS ============
 
 class UpsertMessageReactionRequest(BaseModel):
 	reaction: MessageReactionTypeAPI | None = Field(..., description="Реакция для сообщения. None чтобы удалить")
@@ -116,3 +116,12 @@ class MessageReactionResponse(BaseModel):
 class MessageReactionStatsResponse(BaseModel):
 	reactions: Dict[MessageReactionTypeAPI, int] = Field(default_factory=dict, description="Все реакции сообщения. <reaction>: <count>")
 	total: int = Field(..., description="Количество реакций")
+
+# ============ MESSAGE AI SCHEMAS ============
+
+class MessageAIImproveTextRequest(BaseModel):
+	text: str
+
+class MessageAIImproveTextResponse(BaseModel):
+	input_text: str
+	output_text: str | None

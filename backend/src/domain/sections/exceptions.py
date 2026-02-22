@@ -79,3 +79,13 @@ class SectionValidationError(UnprocessableEntityError):
 			},
 			**kwargs
 		)
+
+class SectionAIDisabled(BusinessRuleError):
+	error_code = "ai_disabled_for_section"
+
+	def __init__(self, section_id: UUID, section_code: str, **kwargs):
+		super().__init__(
+			message="AI disabled for this section",
+			details={"section_id": str(section_id), "section_code": str(section_code)},
+			**kwargs
+		)

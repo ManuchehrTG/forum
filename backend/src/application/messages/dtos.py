@@ -34,3 +34,7 @@ class MessageDTO(BaseModel):
 	reply_to_message_id: UUID | None = None
 
 	media_files: List[MessageMediaFileDTO] = Field(default_factory=list)
+
+class MessageImproveTextDTO(BaseModel):
+	input_text: str
+	output_text: str | None
